@@ -8,7 +8,7 @@ const router = express.Router();
 router.get("/", genreSeriesController.getAll);
 router.get("/:id", genreSeriesController.getById);
 router.post("/",validate(genreSeriesValidationSchema.create), genreSeriesController.add);
-router.patch("/:id", authenticate, validate(genreSeriesValidationSchema.update),genreSeriesController.update);
-router.delete("/:id", authenticate, genreSeriesController.delete);
+router.patch("/:id", validate(genreSeriesValidationSchema.update),genreSeriesController.update);
+router.delete("/:id", genreSeriesController.delete);
 
 export default router;

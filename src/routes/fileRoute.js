@@ -8,7 +8,7 @@ const router = express.Router();
 router.get("/", fileController.getAll);
 router.get("/:id", fileController.getById);
 router.post("/",validate(fileValidationSchema.create), fileController.add);
-router.patch("/:id", authenticate, validate(fileValidationSchema.update),fileController.update);
-router.delete("/:id", authenticate, fileController.delete);
+router.patch("/:id", validate(fileValidationSchema.update),fileController.update);
+router.delete("/:id", fileController.delete);
 
 export default router;

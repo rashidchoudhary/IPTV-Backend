@@ -8,8 +8,8 @@ const router = express.Router();
 router.get("/", streamController.getAll);
 router.get("/:id", streamController.getById);
 router.post("/",validate(streamValidationSchema.create), streamController.add);
-router.patch("/:id", authenticate, validate(streamValidationSchema.update),streamController.update);
-router.delete("/:id", authenticate, streamController.delete);
+router.patch("/:id", validate(streamValidationSchema.update),streamController.update);
+router.delete("/:id", streamController.delete);
 
 router.get("/:id/episode",streamController.getEpisodeOfStreamByStreamId);
 

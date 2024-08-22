@@ -12,5 +12,5 @@ export default async function expressLoader({ app }) {
 	app.use(express.urlencoded({ extended: true }));
 
 	app.use("/", unProtectedRouter);
-	app.use("/", protectedRouter);
+	app.use("/",authenticate,protectedRouter);
 }
