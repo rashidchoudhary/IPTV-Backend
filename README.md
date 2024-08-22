@@ -1,14 +1,12 @@
-# Boilerplate Express Backend API:
+# IPTV Backend Express Project:
 
 ## Description
 
-This is a boilerplate for backend project using ExpressJS, Joi, Mongoose, JWT, Bcrypt, Services, Controllers, Routes, etc. 
+This is IPTV backend project using ExpressJS, Joi, Mongoose, JWT, Bcrypt, Services, Controllers, Routes, etc. 
 
 ## Run Project
 
-### 1. Clone the project
-
-### 2. Install packages
+### 1. Install packages
 
 ```bash
 npm install
@@ -43,26 +41,26 @@ Project structure is like this:
 │   │   ├── success-codes.js
 │   ├── controllers
 │   │   ├── index.js
-│   │   ├── user.controller.js
+│   │   ├── userController.js
 │   ├── loaders
 │   │   ├── express.js
 │   │   ├── index.js
 │   │   ├── mongoose.js
 │   ├── models
 │   │   ├── index.js
-│   │   ├── user.model.js
+│   │   ├── userModel.js
 │   ├── routes
 │   │   ├── index.js
-│   │   ├── user.route.js
+│   │   ├── userRoute.js
 │   ├── services
 │   │   ├── index.js
-│   │   ├── user.service.js
+│   │   ├── userService.js
 │   ├── utils
 │   │   ├── httpResponse.js
 │   │   ├── index.js
 │   ├── validations
 │   │   ├── index.js
-│   │   ├── user.validation.js
+│   │   ├── userValidation.js
 │   ├── index.js
 ├── .dockerignore
 ├── .env
