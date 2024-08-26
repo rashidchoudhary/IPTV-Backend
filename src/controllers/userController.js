@@ -112,26 +112,15 @@ export const userController = {
 			return httpResponse.INTERNAL_SERVER_ERROR(res,err);
 		}
 	},
-	getOneStreamByUserId: async (req,res) =>{
+	getAllEpisodesOfAllStreamsByUserId: async (req,res) =>{
 		try {
-			const data = await userService.getOneStreamByUserId(req.params.id,req.params.streamId);
+			const data = await userService.getAllEpisodesOfAllStreamsByUserId(req.params.id);
 			if(!data) {
 				return httpResponse.NOT_FOUND(res, "Data not found");
 			}
 			return httpResponse.SUCCESS(res, data);
 		} catch (err) {
 			return httpResponse.INTERNAL_SERVER_ERROR(res,err);
-		}
-	},
-	deleteStreamByUserId: async (req,res) =>{
-		try {
-			const data = await userService.deleteStreamByUserId(req.params.id,req.params.streamId);
-			if(!data) {
-				return httpResponse.NOT_FOUND(res, "Data not found");
-			}
-			return httpResponse.SUCCESS(res, data);
-		} catch (err) {
-			return httpResponse.INTERNAL_SERVER_ERROR(res, err);
 		}
 	},
 };

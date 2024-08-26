@@ -7,5 +7,5 @@ const schema = mongoose.Schema({
 { timestamps: true }
 );
 
-export const genreSeriesModel = mongoose.model("Genre Series", schema);
+export const genreSeriesModel = mongoose.model("GenreSeries", schema);
 

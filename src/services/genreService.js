@@ -1,7 +1,6 @@
+import mongoose from "mongoose";
 import { genreModel} from "../models/index.js";
 import { genreSeriesModel } from "../models/index.js";
-import { seriesModel } from "../models/index.js";
-import { seasonModel } from "../models/index.js";
 
 export const genreService = {
     add: async (body) =>{
@@ -25,44 +24,92 @@ export const genreService = {
         return genreModel.findByIdAndUpdate(id,body, { new: true});
     },
     delete: async (id) =>{
-        return genreModel.findByIdAndDelete(id);
+      const data = await genreModel.findByIdAndDelete(id);
+      if (!data) {
+        throw new Error('Genre not found');
+      }
+      await genreSeriesModel.deleteMany({ genre_id: id });
+  
+      return data;
     },
     getAllSeriesByGenreId: async (id) =>{
-        const genre = await genreModel.findById(id);
-        if(!genre) {
-            return "Genre not found";
+      return genreModel.aggregate([
+        {
+          $match: {
+            _id: new mongoose.Types.ObjectId(id)
+          },
+        },
+        {
+          $lookup: {
+            from: "genreSeries",
+            localField: "_id",
+            foreignField: "genre_id",
+            pipeline: [
+              {
+              $lookup: {
+                from: "series",
+                localField: "series_id",
+                foreignField: "_id",
+                as: "series",
+              },
+              },
+              {
+                $unwind: "$series"
+              }
+            ],
+            as: "genreSeries",
+            },
+        },
+        {
+          $unwind: "$genreSeries",
         }
-        const genreSeries = await genreSeriesModel.find({genre_id: id});
-        if(!genreSeries) {
-            return "Genre series not found";
-        }
-        const seriesId = genreSeries[0].series_id;
-        const series = await seriesModel.findById(seriesId);
-        if(!series) {
-            return "Series not found";
-        }
-        return series;
+      ]);
     },
     getAllSeasonOfAllSeriesByGenreId: async (id) => {
-        const genre = await genreModel.findById(id);
-        if (!genre) {
-          return "Genre not found";
-        }
-        const genre_series = await genreSeriesModel.find({ genre_id: id });
-        if (!genre_series) {
-          return "Genre series not found";
-        }
-        const seriesId = genre_series[0].series_id;
-        const series = await seriesModel.findById(seriesId);
-        if (!series) {
-          return "Series not found";
-        }
-        const seasons = await seasonModel.find({ series_id: series._id });
-        if (!seasons) {
-          return "Seasons not found";
-        }
-        return seasons;
+        return genreModel.aggregate([
+          {
+            $match: {
+              _id: new mongoose.Types.ObjectId(id)
+            },
+          },
+          {
+            $lookup: {
+              from: "genreSeries",
+              localField: "_id",
+              foreignField: "genre_id",
+              pipeline: [
+                {
+                $lookup: {
+                  from: "series",
+                  localField: "series_id",
+                  foreignField: "_id",
+                  pipeline: [
+                    {
+                      $lookup: {
+                        from: "seasons",
+                        localField: "_id",
+                        foreignField: "series_id",
+                        as: "seasons",
+                      }
+                    },
+                    {
+                      $unwind: "$seasons",
+                    }
+                  ],
+                  as: "series",
+                },
+                },
+                {
+                  $unwind: "$series",
+                }
+              ],
+              as: "genreSeries",
+              },
+          },
+          {
+            $unwind: "$genreSeries",
+          }
+        ])
       },
-    
 
 }

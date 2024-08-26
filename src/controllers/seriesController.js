@@ -60,7 +60,7 @@ export const seriesController = {
     },
     getAllSeasonsOfSeriesBySeriesId: async (req,res) =>{
         try {
-            const data = await getAllSeasonsOfSeriesBySeriesId(req.params.id);
+            const data = await seriesService.getAllSeasonsOfSeriesBySeriesId(req.params.id);
             if(!data) {
                 return httpResponse.NOT_FOUND(res, "Data not found");
             }
@@ -71,7 +71,7 @@ export const seriesController = {
     },
     getAllEpisodesOfSeriesBySeriesId: async (req,res) =>{
         try {
-            const data = await getAllEpisodesOfSeriesBySeriesId(req.params.id);
+            const data = await seriesService.getAllEpisodesOfSeriesBySeriesId(req.params.id);
             if(!data) {
                 return httpResponse.NOT_FOUND(res, "Data not found");
             }

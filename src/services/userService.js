@@ -1,43 +1,78 @@
 import { userModel } from "../models/index.js";
-import { streamModel } from "../models/index.js";
+import mongoose from "mongoose";
 
 export const userService = {
 	getAll: async (page, limit, sortBy, order, filters) => {
 		const skip = (page - 1) * limit;
 		let sortOrder;
-		if(order === "asc"){
+		if (order === "asc") {
 			sortOrder = 1;
 		} else {
 			sortOrder = -1;
 		}
-		const data = await userModel.find(filters).sort({ [sortBy]: sortOrder}).skip(skip).limit(limit);
+		const data = await userModel.find(filters).sort({ [sortBy]: sortOrder }).skip(skip).limit(limit);
 		return data;
 	},
 
 	getById: async (id) => {
 		return userModel.findById(id);
 	},
-	add: async(body) =>{
+	add: async (body) => {
 		return userModel.create(body);
 	},
-	update: async (id, body) =>{
-		return userModel.findByIdAndUpdate(id,body, {new: true});
+	update: async (id, body) => {
+		return userModel.findByIdAndUpdate(id, body, { new: true });
 	},
-	delete: async (id) =>{
+	delete: async (id) => {
 		return userModel.findByIdAndDelete(id);
 	},
-	login: async (body) =>{
-		return userModel.findOne({ email: body.email});
+	login: async (body) => {
+		return userModel.findOne({ email: body.email });
 	},
-	getAllStreamsById: async (id) =>{
-		return streamModel.find({ user_id: id });
+	getAllStreamsById: async (id) => {
+		return userModel.aggregate([
+			{
+				$match: {
+					_id: new mongoose.Types.ObjectId(id)
+				},
+			},
+			{
+				$lookup: {
+					from: "streams",
+					localField: "_id",
+					foreignField: "user_id",
+					as: "streams",
+				},
+			},
+		])
 	},
-	getOneStreamByUserId: async (user_id, stream_id) =>{
-		return streamModel.find({user_id: user_id, _id: stream_id});
+	getAllEpisodesOfAllStreamsByUserId: async (id) => {
+		return userModel.aggregate([
+			{
+				$match: {
+					_id: new mongoose.Types.ObjectId(id)
+				},
+			},
+			{
+				$lookup: {
+					from: "streams",
+					localField: "_id",
+					foreignField: "user_id",
+					pipeline: [
+					  {
+						$lookup: {
+						  from: "episodes",
+						  localField: "episode_id",
+						  foreignField: "_id",
+						  as: "episodes",
+						},
+					  },
+					],
+					as: "streams",
+				  },
+			}
+		]);
 	},
-	deleteStreamByUserId: async (user_id, stream_id) =>{
-		return streamModel.find({ _id: stream_id, user_id: user_id})
-	}
-	
+
 };
 

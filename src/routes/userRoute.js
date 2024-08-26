@@ -11,7 +11,6 @@ router.post("/login", validate(UserValidationSchema.login), userController.login
 router.patch("/:id",authenticate,validate(UserValidationSchema.update),userController.update);
 router.delete("/:id",authenticate,userController.delete);
 router.get("/:id/streams",authenticate,userController.getAllStreamsById);
-router.get("/:id/streams/:streamId", authenticate,userController.getOneStreamByUserId);
-router.delete("/:id/streams/:streamId",authenticate ,userController.deleteStreamByUserId);
+router.get("/:id/streams/episodes", authenticate,userController.getAllEpisodesOfAllStreamsByUserId);
 
 export default router;

@@ -1,5 +1,5 @@
+import mongoose from "mongoose";
 import { seasonModel } from "../models/index.js";
-import { episodeModel } from "../models/index.js";
 
 export const seasonService = {
     
@@ -30,6 +30,23 @@ export const seasonService = {
         return seasonModel.findByIdAndDelete(id);
       },
       getAllEpisodesOfseasonBySeasonId: async (id) =>{
-        return episodeModel.find({ season_id: id});
+        return seasonModel.aggregate([
+          {
+            $match: {
+              _id: new mongoose.Types.ObjectId(id)
+            },
+          },
+          {
+            $lookup: {
+              from: "episodes",
+              localField: "_id",
+              foreignField: "season_id",
+              as: "episodes",
+            },
+          },
+          {
+            $unwind: "$episodes",
+          },
+        ])
       },
 };

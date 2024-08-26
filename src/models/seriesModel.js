@@ -5,6 +5,7 @@ const schema = mongoose.Schema({
     description: { type: String, required: true},
     trailer_id: { type: mongoose.Schema.Types.ObjectId, ref: "File", required: true},
     thumbnail_id: { type: mongoose.Schema.Types.ObjectId, ref: "File", required: true},
+    genre_ids: [{type: mongoose.Schema.Types.ObjectId, ref: 'Genre',}],
 },
 { timestamps: true }
 );

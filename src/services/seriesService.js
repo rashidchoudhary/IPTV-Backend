@@ -1,7 +1,7 @@
+import mongoose from "mongoose";
 import { seriesModel } from "../models/seriesModel.js";
+import { genreSeriesModel } from "../models/genreSeriesModel.js";
 import { seasonModel } from "../models/seasonModel.js";
-import { episodeModel } from "../models/episodeModel.js";
-import { httpResponse } from "../utils/httpResponse.js"
 
 export const seriesService = {
   getAll: async (page, limit, sortBy, order) => {
@@ -21,28 +21,100 @@ export const seriesService = {
   getById: async (id) => {
     return seriesModel.findById(id);
   },
-  add: async (body) => {
-    return seriesModel.create(body);
+  add: async (data) => {
+    const { name, description, trailer_id, thumbnail_id, genre_ids } = data;
+
+    const result = await seriesModel.create({ name, description, trailer_id, thumbnail_id });
+
+    if (genre_ids && genre_ids.length > 0) {
+      const genreSeriesData = genre_ids.map(genreId => ({
+        genre_id: genreId,
+        series_id: result._id
+      }));
+      await genreSeriesModel.insertMany(genreSeriesData);
+    }
+
+    return result;
   },
-  update: async (id, body) => {
-    return seriesModel.findByIdAndUpdate(id, body);
+  update: async (id, data) => {
+    const { title, description, trailer_id, thumbnail_id, genre_ids } = data;
+
+    const result = await seriesModel.findByIdAndUpdate(id, { title, description, trailer_id, thumbnail_id }, { new: true });
+
+    if (genre_ids) {
+
+      await genreSeriesModel.deleteMany({ series_id: id });
+
+      const genreSeriesData = genre_ids.map(genreId => ({
+        genre_id: genreId,
+        series_id: id
+      }));
+      await genreSeriesModel.insertMany(genreSeriesData);
+    }
+
+    return result;
   },
   delete: async (id) => {
-    return seriesModel.findByIdAndDelete(id);
+    const data = await seriesModel.findByIdAndDelete(id);
+    if (!data) {
+      throw new Error('Series not found');
+    }
+    await genreSeriesModel.deleteMany({ series_id: id });
+    await seasonModel.deleteMany({ series_id: id});
+
+    return data;
   },
   getAllSeasonsOfSeriesBySeriesId: async (id) => {
-    return seasonModel.find({ series_id: id });
+    return seriesModel.aggregate([
+			{
+				$match: {
+					_id: new mongoose.Types.ObjectId(id)
+				},
+			},
+			{
+				$lookup: {
+					from: "seasons",
+					localField: "_id",
+					foreignField: "series_id",
+					as: "seasons",
+				},
+			},
+      {
+        $unwind: "$seasons",
+      },
+		])
   },
   getAllEpisodesOfSeriesBySeriesId: async (id) => {
-    const season = await seasonModel.findOne({ series_id: id });
-    if (!season) {
-      return httpResponse.NOT_FOUND("Season not found");
-    }
-    const episodes = await episodeModel.find({ season_id: season._id });
-
-    if (!episodes || episodes.length === 0) {
-      return httpResponse.NOT_FOUND("No episodes found for this season");
-    }
-    return episodes;
+    return seriesModel.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(id)
+        },
+      },
+      {
+        $lookup: {
+          from: "seasons",
+          localField: "_id",
+          foreignField: "series_id",
+          pipeline: [
+            {
+            $lookup: {
+              from: "episodes",
+              localField: "_id",
+              foreignField: "season_id",
+              as: "episodes",
+            },
+            },
+            {
+              $unwind: "$episodes"
+            }
+          ],
+          as: "seasons",
+          },
+      },
+      {
+        $unwind: "$seasons",
+      }
+    ]);
   },
 };
