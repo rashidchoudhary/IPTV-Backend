@@ -61,7 +61,7 @@ export const episodeController = {
     },
     getStreamsOfEpisodeByEpisodeId: async (req,res) =>{
         try {
-            const data = await seasonService.getStreamsOfEpisodeByEpisodeId(req.params.id);
+            const data = await episodeService.getStreamsOfEpisodeByEpisodeId(req.params.id);
             if (!data) {
                 return httpResponse.NOT_FOUND(res, "Data not found");
             }

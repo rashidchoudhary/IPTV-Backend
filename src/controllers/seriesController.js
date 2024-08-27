@@ -30,13 +30,10 @@ export const seriesController = {
     },
     add: async (req, res) => {
             try {
-                // req.file contains the uploaded file
-                // req.body contains the other form fields
-                console.log(req.body);
-                const data = req.body; // Extract form data
-                const file = req.file; // Extract the uploaded file
+                
+                const data = req.body; 
+                const file = req.file; 
 
-                // Call the service to handle adding the series
                 const result = await seriesService.add(data, file);
                 return httpResponse.SUCCESS(res, result);
             } catch (err) {

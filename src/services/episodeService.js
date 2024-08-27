@@ -1,4 +1,4 @@
-import { streamModel } from "../models/index.js";
+import mongoose from "mongoose";
 import { episodeModel } from "../models/index.js";
 
 export const episodeService = {
@@ -30,6 +30,23 @@ export const episodeService = {
         return episodeModel.findByIdAndDelete(id);
       },
       getStreamsOfEpisodeByEpisodeId: async (id) =>{
-        return streamModel.find({ episode_id: id});
+        return episodeModel.aggregate([
+          {
+            $match: {
+              _id: new mongoose.Types.ObjectId(id)
+            },
+          },
+          {
+            $lookup: {
+              from: "streams",
+              localField: "_id",
+              foreignField: "episode_id",
+              as: "streams",
+            },
+          },
+          {
+            $unwind: "$streams",
+          },
+        ])
       },
 };

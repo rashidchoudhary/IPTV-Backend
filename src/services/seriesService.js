@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { seriesModel } from "../models/seriesModel.js";
 import { genreSeriesModel } from "../models/genreSeriesModel.js";
 import { fileModel } from "../models/index.js";
+import { seasonModel } from "../models/index.js";
 import fs from 'fs';
 import path from 'path';
 
@@ -173,8 +174,6 @@ update: async (id, data, file) => {
       fs.unlink(filePath, (err) => {
         if (err) {
           console.error("Error deleting file:", err);
-        } else {
-          console.log("File deleted successfully:", filePath);
         }
       });
     }
