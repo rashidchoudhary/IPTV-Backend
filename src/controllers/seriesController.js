@@ -28,25 +28,36 @@ export const seriesController = {
             return httpResponse.INTERNAL_SERVER_ERROR(res,err);
         }
     },
-    add: async (req,res) =>{
-        try {
-            const data = await seriesService.add(req.body);
-            return httpResponse.CREATED(res,data);
-        } catch (err) {
-            return httpResponse.INTERNAL_SERVER_ERROR(res,err);
-        }
-    },
-    update: async (req, res) => {
-        try {
-            const data = await seriesService.update(req.params.id, req.body);
-            if (!data) {
-                return httpResponse.NOT_FOUND(res, "Series not found");
+    add: async (req, res) => {
+            try {
+                // req.file contains the uploaded file
+                // req.body contains the other form fields
+                console.log(req.body);
+                const data = req.body; // Extract form data
+                const file = req.file; // Extract the uploaded file
+
+                // Call the service to handle adding the series
+                const result = await seriesService.add(data, file);
+                return httpResponse.SUCCESS(res, result);
+            } catch (err) {
+                return httpResponse.INTERNAL_SERVER_ERROR(res, err);
             }
-            return httpResponse.SUCCESS(res, data);
-        } catch (err) {
-            return httpResponse.INTERNAL_SERVER_ERROR(res, err);
-        }
-    },
+        },
+        update: async (req, res) => {
+            try {
+                const data = req.body;
+                const file = req.file; // Extract the uploaded file if provided
+        
+                const result = await seriesService.update(req.params.id, data, file);
+                if (!result) {
+                    return httpResponse.NOT_FOUND(res, "Series not found");
+                }
+                return httpResponse.SUCCESS(res, result);
+            } catch (err) {
+                return httpResponse.INTERNAL_SERVER_ERROR(res, err);
+            }
+        },
+        
     delete: async (req, res) => {
         try {
             const data = await seriesService.delete(req.params.id);

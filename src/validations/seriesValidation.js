@@ -10,8 +10,8 @@ export const seriesValidationSchema = {
         body: Joi.object().keys({
             name: Joi.string().required(),
             description: Joi.string().optional(),
-            trailer_id: Joi.string().required(),
-            thumbnail_id: Joi.string().required(),
+            // trailer_id: Joi.string().required(),
+            // thumbnail_id: Joi.string().required(),
             genre_ids: Joi.array().items(Joi.string()).required(),
         }),
     },
@@ -23,8 +23,8 @@ export const seriesValidationSchema = {
         body: Joi.object().keys({
             name: Joi.string(),
             description: Joi.string(),
-            trailer_id: Joi.string(),
-            thumbnail_id: Joi.string(),
+            // trailer_id: Joi.string(),
+            // thumbnail_id: Joi.string(),
             genre_ids: Joi.array().items(Joi.string()).required(),
         }),
     },
