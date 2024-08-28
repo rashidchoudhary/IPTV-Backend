@@ -43,16 +43,20 @@ export const userController = {
 		}
 	},
 	add: async (req, res) => {
-		try {
-			const salt = await bcrypt.genSalt();
-			const hashedpassword = await bcrypt.hash(req.body.password, 10);
-			req.body.password = hashedpassword;
-			const data = await userService.add(req.body);
-			return httpResponse.CREATED(res, data);
-		} catch (error) {
-			return httpResponse.INTERNAL_SERVER_ERROR(res, error);
-		}
-	},
+        try {
+            const salt = await bcrypt.genSalt();
+            const hashedPassword = await bcrypt.hash(req.body.password, 10);
+            req.body.password = hashedPassword;
+
+            const data = await userService.add(req.body);
+            return httpResponse.CREATED(res, data);
+        } catch (error) {
+            if (error.message === 'User already exists') {
+                return httpResponse.BAD_REQUEST(res, "User already exists");
+            }
+            return httpResponse.INTERNAL_SERVER_ERROR(res, error);
+        }
+    },
 	update: async (req, res) => {
 		try {
 			const salt = await bcrypt.genSalt();
@@ -83,7 +87,7 @@ export const userController = {
             const data = await userService.login(req.body);
 
             if (!data) {
-                return httpResponse.NOT_FOUND(res, "User not found");
+                return httpResponse.NOT_FOUND(res, "Invalid Credentials");
             }
 
             const isPasswordCorrect = await bcrypt.compare(req.body.password, data.password);

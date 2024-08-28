@@ -18,8 +18,12 @@ export const userService = {
 		return userModel.findById(id);
 	},
 	add: async (body) => {
-		return userModel.create(body);
-	},
+        const existingUser = await userModel.findOne({ email: body.email });
+        if (existingUser) {
+            throw new mongoose.Error('User already exists');
+        }
+        return userModel.create(body);
+    },
 	update: async (id, body) => {
 		return userModel.findByIdAndUpdate(id, body, { new: true });
 	},
