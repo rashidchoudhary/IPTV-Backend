@@ -29,24 +29,20 @@ export const seriesService = {
     let { genre_ids } = data;
 
     // Check if genre_ids is an array containing a string
-    if (Array.isArray(genre_ids) && genre_ids.length === 1 && typeof genre_ids[0] === 'string') {
+    if (Array.isArray(genre_ids)) {
         try {
-            // Extract the string from the array and parse it
-            genre_ids = JSON.parse(genre_ids[0]);
+            // Convert each genre_id to ObjectId
+            genre_ids = genre_ids.map(id => mongoose.Types.ObjectId(id));
+        } catch (err) {
+            throw new Error('Invalid ObjectId format in genre_ids');
+        }
+    } else if (typeof genre_ids === 'string') {
+        try {
+            // If genre_ids is a string, parse it to JSON
+            genre_ids = JSON.parse(genre_ids);
+            genre_ids = genre_ids.map(id => mongoose.Types.ObjectId(id));
         } catch (err) {
             throw new Error('Invalid genre_ids format');
-        }
-
-        // Check if parsed genre_ids is an array
-        if (Array.isArray(genre_ids)) {
-            try {
-                // Convert each genre_id to ObjectId
-                genre_ids = genre_ids.map(id => mongoose.Types.ObjectId(id));
-            } catch (err) {
-                throw new Error('Invalid ObjectId format in genre_ids');
-            }
-        } else {
-            throw new Error('genre_ids must be an array');
         }
     } else {
         throw new Error('Invalid genre_ids format');
@@ -67,6 +63,7 @@ export const seriesService = {
         description,
         trailer_id: fileData._id,
         thumbnail_id: fileData._id,
+        genre_ids,
     });
 
     // Handle genre-series mapping
@@ -106,6 +103,7 @@ update: async (id, data, file) => {
     const updatedData = {
         name,
         description,
+        genre_ids,
     };
 
     // Handle file upload
