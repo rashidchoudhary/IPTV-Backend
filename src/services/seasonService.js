@@ -24,7 +24,8 @@ export const seasonService = {
         return seasonModel.create(body);
       },
       update: async (id, body) => {
-        return seasonModel.findByIdAndUpdate(id, body);
+        return seasonModel.findByIdAndUpdate(id, body, { new: true });
+
       },
       delete: async (id) => {
         return seasonModel.findByIdAndDelete(id);
