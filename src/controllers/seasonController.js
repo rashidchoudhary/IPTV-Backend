@@ -6,7 +6,7 @@ export const seasonController = {
     getAll: async (req, res) => {
         try {
             const page = parseInt(req.query.page) || 1;
-            const limit = parseInt(req.query.limit) || 10;
+            const limit = parseInt(req.query.limit) || 20;
             const sortBy = req.query.sortBy || "createdAt";
             const order = req.query.order || "asc";
             const data = await seasonService.getAll(page, limit, sortBy, order);
